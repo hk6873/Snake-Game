@@ -1,0 +1,22 @@
+package Resources;
+
+import java.awt.*;
+
+
+public class Resource_Loader {
+	
+	static Resource_Loader rl = new Resource_Loader();
+	
+	public static Image getImage(String fileName){
+		
+		return Toolkit.getDefaultToolkit().getImage(rl.getClass().getResource("Images/" + fileName));
+		
+	}
+	
+	public static Image getAudio(String fileName){
+		
+		return Toolkit.getDefaultToolkit().getImage(rl.getClass().getResource("Audio/"+ fileName));
+			
+	}
+	
+}
