@@ -1,0 +1,964 @@
+package Snake;
+
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Random;
+
+import javax.swing.*;
+
+import Resources.Resource_Loader;
+import sun.audio.AudioPlayer;
+import sun.audio.AudioStream;
+
+/**
+ *
+ * The main class for my Snake Game.
+ * @author harryklein
+ *
+ */
+
+public class Snake implements ActionListener, KeyListener{
+
+	public static Snake game;
+	public JFrame Main_menu;
+	public JFrame Login_menu;
+	public JFrame Help_menu;
+	public JFrame Easy_Game;
+	public JFrame Game_frame;
+	public JFrame Hard_Game;
+	public JFrame Scoreboard_menu;
+	public JFrame Settings_menu;
+	public JFrame level_Select;
+	public JFrame game_Over;
+	public JButton main_menu;
+	public static Dimension dim;
+	
+	public static Color light_blue = new Color(0x66FFCC);
+    public static Color dark_green = new Color(0x004304);
+    public Render render;
+    public Easy_Render easy_render;
+    public Hard_Render hard_render;
+    public Timer timer = new Timer(20, this);
+    public ArrayList<Point> snakeParts = new ArrayList<Point>();
+    public static final int UP = 0, DOWN = 1, LEFT = 2, RIGHT = 3, SCALE = 10;
+    public int ticks = 0;
+    public int direction = DOWN;
+    public int score;
+    public int tailLength;
+    public int time;
+    public int bonus_rand = 0;
+    public int deathb_rand = 0;
+    public int goldg_rand = 0;
+    public Point head;
+    public Point easy_grape;
+    public Point grape;
+    public Point hard_grape;
+    public Point poison;
+    public Point poison2;
+    public Point poison3;
+    public Point death_blossom;
+    public Point golden_grape;
+    public Point bonus;
+    public Random random;
+    public boolean over = false, paused; 	
+    
+    //This subroutine handles the music in the main menu.
+    public static void mm_music(){
+    	AudioStream BGM;        	
+    	try{
+    		InputStream test = new FileInputStream("res/Resources/Audio/8-bit v.1.wav");
+    		BGM = new AudioStream(test);
+    		AudioPlayer.player.start(BGM);
+    	} catch (FileNotFoundException e) {
+   			JFrame exception = new JFrame("ERROR");
+   			exception.setVisible(true);
+   			exception.setSize(300,70);
+   			dim = Toolkit.getDefaultToolkit().getScreenSize();
+   			exception.setLayout(new FlowLayout());
+   			exception.setLocation(dim.width / 2 - exception.getWidth() / 2, dim.height / 2 - exception.getHeight() / 2);
+   			JLabel label = new JLabel("File Not found, restart program.");
+   			exception.add(label);
+   			JLabel label2 = new JLabel("ERROR CODE 001");
+   			exception.add(label2);
+    		System.out.println(e);
+    	} catch (IOException e) {
+    		JFrame exception = new JFrame("ERROR");
+   			exception.setVisible(true);
+   			exception.setSize(300,70);
+   			dim = Toolkit.getDefaultToolkit().getScreenSize();
+   			exception.setLayout(new FlowLayout());
+   			exception.setLocation(dim.width / 2 - exception.getWidth() / 2, dim.height / 2 - exception.getHeight() / 2);
+   			JLabel label = new JLabel("Input Output exception, restart program.");
+   			exception.add(label);
+   			JLabel label2 = new JLabel("ERROR CODE 002");
+   			exception.add(label2);
+   			System.out.println(e);
+    	}
+    }
+    
+    //This subroutine handles the music in the settings menu.
+    public static void hm_music(){
+    	AudioStream BGM;        	
+    	try{    		
+    		InputStream test = new FileInputStream("res/Resources/Audio/Help_menu.wav");
+    		BGM = new AudioStream(test);
+    		AudioPlayer.player.start(BGM);
+    	} catch (FileNotFoundException e) {
+    		JFrame exception = new JFrame("ERROR");
+   			exception.setVisible(true);
+   			exception.setSize(300,70);
+   			dim = Toolkit.getDefaultToolkit().getScreenSize();
+   			exception.setLayout(new FlowLayout());
+   			exception.setLocation(dim.width / 2 - exception.getWidth() / 2, dim.height / 2 - exception.getHeight() / 2);
+   			JLabel label = new JLabel("File Not found, restart program.");
+   			exception.add(label);
+   			JLabel label2 = new JLabel("ERROR CODE 001");
+   			exception.add(label2);
+   			System.out.println(e);
+    	} catch (IOException e) {
+    		JFrame exception = new JFrame("ERROR");
+   			exception.setVisible(true);
+   			exception.setSize(300,70);
+   			dim = Toolkit.getDefaultToolkit().getScreenSize();
+   			exception.setLayout(new FlowLayout());
+   			exception.setLocation(dim.width / 2 - exception.getWidth() / 2, dim.height / 2 - exception.getHeight() / 2);
+   			JLabel label = new JLabel("Input Output exception, restart program.");
+   			exception.add(label);
+   			JLabel label2 = new JLabel("ERROR CODE 002");
+   			exception.add(label2);
+   			System.out.println(e);
+    	}
+    }
+    
+    //This subroutine handles the music for the hard mode start.
+    public static void hard_music(){
+    	AudioStream BGM;        	
+    	try{    		
+    		InputStream test = new FileInputStream("res/Resources/Audio/hard_intro.wav");
+    		BGM = new AudioStream(test);
+    		AudioPlayer.player.start(BGM);
+    	} catch (FileNotFoundException e) {
+    		JFrame exception = new JFrame("ERROR");
+   			exception.setVisible(true);
+   			exception.setSize(300,70);
+   			dim = Toolkit.getDefaultToolkit().getScreenSize();
+   			exception.setLayout(new FlowLayout());
+   			exception.setLocation(dim.width / 2 - exception.getWidth() / 2, dim.height / 2 - exception.getHeight() / 2);
+   			JLabel label = new JLabel("File Not found, restart program.");
+   			exception.add(label);
+   			JLabel label2 = new JLabel("ERROR CODE 001");
+   			exception.add(label2);
+   			System.out.println(e);
+    	} catch (IOException e) {
+    		JFrame exception = new JFrame("ERROR");
+   			exception.setVisible(true);
+   			exception.setSize(300,70);
+   			dim = Toolkit.getDefaultToolkit().getScreenSize();
+   			exception.setLayout(new FlowLayout());
+   			exception.setLocation(dim.width / 2 - exception.getWidth() / 2, dim.height / 2 - exception.getHeight() / 2);
+   			JLabel label = new JLabel("Input Output exception, restart program.");
+   			exception.add(label);
+   			JLabel label2 = new JLabel("ERROR CODE 002");
+   			exception.add(label2);
+   			System.out.println(e);
+    	}
+    }
+    
+    //This subroutine handles the music for the easy mode start.
+    public static void easy_music(){
+    	AudioStream BGM;        	
+    	try{    		
+    		InputStream test = new FileInputStream("res/Resources/Audio/easy_intro.wav");
+    		BGM = new AudioStream(test);
+    		AudioPlayer.player.start(BGM);
+    	} catch (FileNotFoundException e) {
+    		JFrame exception = new JFrame("ERROR");
+   			exception.setVisible(true);
+   			exception.setSize(300,70);
+   			dim = Toolkit.getDefaultToolkit().getScreenSize();
+   			exception.setLayout(new FlowLayout());
+   			exception.setLocation(dim.width / 2 - exception.getWidth() / 2, dim.height / 2 - exception.getHeight() / 2);
+   			JLabel label = new JLabel("File Not found, restart program.");
+   			exception.add(label);
+   			JLabel label2 = new JLabel("ERROR CODE 001");
+   			exception.add(label2);
+   			System.out.println(e);
+    	} catch (IOException e) {
+    		JFrame exception = new JFrame("ERROR");
+   			exception.setVisible(true);
+   			exception.setSize(300,70);
+   			dim = Toolkit.getDefaultToolkit().getScreenSize();
+   			exception.setLayout(new FlowLayout());
+   			exception.setLocation(dim.width / 2 - exception.getWidth() / 2, dim.height / 2 - exception.getHeight() / 2);
+   			JLabel label = new JLabel("Input Output exception, restart program.");
+   			exception.add(label);
+   			JLabel label2 = new JLabel("ERROR CODE 002");
+   			exception.add(label2);
+   			System.out.println(e);
+    	}
+    }
+ 
+    //This subroutine handles the music for the normal mode start.
+    public static void norm_music(){
+    	AudioStream BGM;        	
+    	try{    		
+    		InputStream test = new FileInputStream("res/Resources/Audio/normal_intro.wav");
+    		BGM = new AudioStream(test);
+    		AudioPlayer.player.start(BGM);
+    	} catch (FileNotFoundException e) {
+    		JFrame exception = new JFrame("ERROR");
+   			exception.setVisible(true);
+   			exception.setSize(300,70);
+   			dim = Toolkit.getDefaultToolkit().getScreenSize();
+   			exception.setLayout(new FlowLayout());
+   			exception.setLocation(dim.width / 2 - exception.getWidth() / 2, dim.height / 2 - exception.getHeight() / 2);
+   			JLabel label = new JLabel("File Not found, restart program.");
+   			exception.add(label);
+   			JLabel label2 = new JLabel("ERROR CODE 001");
+   			exception.add(label2);
+   			System.out.println(e);
+    	} catch (IOException e) {
+    		JFrame exception = new JFrame("ERROR");
+   			exception.setVisible(true);
+   			exception.setSize(300,70);
+   			dim = Toolkit.getDefaultToolkit().getScreenSize();
+   			exception.setLayout(new FlowLayout());
+   			exception.setLocation(dim.width / 2 - exception.getWidth() / 2, dim.height / 2 - exception.getHeight() / 2);
+   			JLabel label = new JLabel("Input Output exception, restart program.");
+   			exception.add(label);
+   			JLabel label2 = new JLabel("ERROR CODE 002");
+   			exception.add(label2);
+   			System.out.println(e);
+    	}
+    }
+
+    //This subroutine handles the SFX for when a grape is picked up.
+    public static void grape_music(){
+    	AudioStream BGM;        	
+    	try{    		
+    		InputStream test = new FileInputStream("res/Resources/Audio/grape_pickup.wav");
+    		BGM = new AudioStream(test);
+    		AudioPlayer.player.start(BGM);
+    	} catch (FileNotFoundException e) {
+    		JFrame exception = new JFrame("ERROR");
+   			exception.setVisible(true);
+   			exception.setSize(300,70);
+   			dim = Toolkit.getDefaultToolkit().getScreenSize();
+   			exception.setLayout(new FlowLayout());
+   			exception.setLocation(dim.width / 2 - exception.getWidth() / 2, dim.height / 2 - exception.getHeight() / 2);
+   			JLabel label = new JLabel("File Not found, restart program.");
+   			exception.add(label);
+   			JLabel label2 = new JLabel("ERROR CODE 001");
+   			exception.add(label2);
+   			System.out.println(e);
+    	} catch (IOException e) {
+   			System.out.println(e);
+    	}
+    }
+    
+    //This subroutine handles the SFX for when a poison is picked up.
+    public static void poison_music(){
+    	AudioStream BGM;        	
+    	try{    		
+    		InputStream test = new FileInputStream("res/Resources/Audio/poison_pickup.wav");
+    		BGM = new AudioStream(test);
+    		AudioPlayer.player.start(BGM);
+    	} catch (FileNotFoundException e) {
+    		JFrame exception = new JFrame("ERROR");
+   			exception.setVisible(true);
+   			exception.setSize(300,70);
+   			dim = Toolkit.getDefaultToolkit().getScreenSize();
+   			exception.setLayout(new FlowLayout());
+   			exception.setLocation(dim.width / 2 - exception.getWidth() / 2, dim.height / 2 - exception.getHeight() / 2);
+   			JLabel label = new JLabel("File Not found, restart program.");
+   			exception.add(label);
+   			JLabel label2 = new JLabel("ERROR CODE 001");
+   			exception.add(label2);
+   			System.out.println(e);
+    	} catch (IOException e) {
+    		JFrame exception = new JFrame("ERROR");
+   			exception.setVisible(true);
+   			exception.setSize(300,70);
+   			dim = Toolkit.getDefaultToolkit().getScreenSize();
+   			exception.setLayout(new FlowLayout());
+   			exception.setLocation(dim.width / 2 - exception.getWidth() / 2, dim.height / 2 - exception.getHeight() / 2);
+   			JLabel label = new JLabel("Input Output exception, restart program.");
+   			exception.add(label);
+   			JLabel label2 = new JLabel("ERROR CODE 002");
+   			exception.add(label2);
+   			System.out.println(e);
+    	}
+    }
+    
+    //This subroutine handles the SFX for when a golden grape is picked up.
+    public static void goldgrape_music(){
+    	AudioStream BGM;        	
+    	try{    		
+    		InputStream test = new FileInputStream("res/Resources/Audio/goldgrape_pickup.wav");
+    		BGM = new AudioStream(test);
+    		AudioPlayer.player.start(BGM);
+    	} catch (FileNotFoundException e) {
+    		JFrame exception = new JFrame("ERROR");
+   			exception.setVisible(true);
+   			exception.setSize(300,70);
+   			dim = Toolkit.getDefaultToolkit().getScreenSize();
+   			exception.setLayout(new FlowLayout());
+   			exception.setLocation(dim.width / 2 - exception.getWidth() / 2, dim.height / 2 - exception.getHeight() / 2);
+   			JLabel label = new JLabel("File Not found, restart program.");
+   			exception.add(label);
+   			JLabel label2 = new JLabel("ERROR CODE 001");
+   			exception.add(label2);
+   			System.out.println(e);
+    	} catch (IOException e) {
+    		JFrame exception = new JFrame("ERROR");
+   			exception.setVisible(true);
+   			exception.setSize(300,70);
+   			dim = Toolkit.getDefaultToolkit().getScreenSize();
+   			exception.setLayout(new FlowLayout());
+   			exception.setLocation(dim.width / 2 - exception.getWidth() / 2, dim.height / 2 - exception.getHeight() / 2);
+   			JLabel label = new JLabel("Input Output exception, restart program.");
+   			exception.add(label);
+   			JLabel label2 = new JLabel("ERROR CODE 002");
+   			exception.add(label2);
+   			System.out.println(e);
+    	}
+    }
+    
+    //This subroutine handles the SFX for when a bonus is picked up.
+    public static void bonus_music(){
+    	AudioStream BGM;        	
+    	try{    		
+    		InputStream test = new FileInputStream("res/Resources/Audio/bonus_pickup.wav");
+    		BGM = new AudioStream(test);
+    		AudioPlayer.player.start(BGM);
+    	} catch (FileNotFoundException e) {
+    		JFrame exception = new JFrame("ERROR");
+   			exception.setVisible(true);
+   			exception.setSize(300,70);
+   			dim = Toolkit.getDefaultToolkit().getScreenSize();
+   			exception.setLayout(new FlowLayout());
+   			exception.setLocation(dim.width / 2 - exception.getWidth() / 2, dim.height / 2 - exception.getHeight() / 2);
+   			JLabel label = new JLabel("File Not found, restart program.");
+   			exception.add(label);
+   			JLabel label2 = new JLabel("ERROR CODE 001");
+   			exception.add(label2);
+   			System.out.println(e);
+    	} catch (IOException e) {
+    		JFrame exception = new JFrame("ERROR");
+   			exception.setVisible(true);
+   			exception.setSize(300,70);
+   			dim = Toolkit.getDefaultToolkit().getScreenSize();
+   			exception.setLayout(new FlowLayout());
+   			exception.setLocation(dim.width / 2 - exception.getWidth() / 2, dim.height / 2 - exception.getHeight() / 2);
+   			JLabel label = new JLabel("Input Output exception, restart program.");
+   			exception.add(label);
+   			JLabel label2 = new JLabel("ERROR CODE 002");
+   			exception.add(label2);
+   			System.out.println(e);
+    	}
+    }
+    
+    //This subroutine handles the SFX for when a death_blossom is picked up.
+    public static void db_music(){
+    	AudioStream BGM;        	
+    	try{    		
+    		InputStream test = new FileInputStream("res/Resources/Audio/death_blossom.wav");
+    		BGM = new AudioStream(test);
+    		AudioPlayer.player.start(BGM);
+    	} catch (FileNotFoundException e) {
+    		JFrame exception = new JFrame("ERROR");
+   			exception.setVisible(true);
+   			exception.setSize(300,70);
+   			dim = Toolkit.getDefaultToolkit().getScreenSize();
+   			exception.setLayout(new FlowLayout());
+   			exception.setLocation(dim.width / 2 - exception.getWidth() / 2, dim.height / 2 - exception.getHeight() / 2);
+   			JLabel label = new JLabel("File Not found, restart program.");
+   			exception.add(label);
+   			JLabel label2 = new JLabel("ERROR CODE 001");
+   			exception.add(label2);
+   			System.out.println(e);
+    	} catch (IOException e) {
+    		JFrame exception = new JFrame("ERROR");
+   			exception.setVisible(true);
+   			exception.setSize(300,70);
+   			dim = Toolkit.getDefaultToolkit().getScreenSize();
+   			exception.setLayout(new FlowLayout());
+   			exception.setLocation(dim.width / 2 - exception.getWidth() / 2, dim.height / 2 - exception.getHeight() / 2);
+   			JLabel label = new JLabel("Input Output exception, restart program.");
+   			exception.add(label);
+   			JLabel label2 = new JLabel("ERROR CODE 002");
+   			exception.add(label2);
+   			System.out.println(e);
+    	}
+    }
+    
+    //The class where the jframes are created and the jbuttons are programmed.
+	@SuppressWarnings("serial")
+	public Snake() throws IOException {
+		
+		dim = Toolkit.getDefaultToolkit().getScreenSize();
+		
+		//The normal difficulty game frame.
+		Game_frame = new JFrame("Easy Snake by Harry Klein");  
+        Game_frame.setSize(800, 700);      
+        Game_frame.setLocation(dim.width / 2 - Game_frame.getWidth() / 2, dim.height / 2 - Game_frame.getHeight() / 2);
+        Game_frame.add(render = new Render());
+        Game_frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        Game_frame.addKeyListener(this);
+        Game_frame.setVisible(false);
+        
+        //The easy difficulty game frame.
+        Easy_Game = new JFrame("Normal Snake by Harry Klein");
+        Easy_Game.setSize(800, 700);
+        Easy_Game.setLocation(dim.width / 2 - Easy_Game.getWidth() / 2, dim.height / 2 - Easy_Game.getHeight() / 2);
+        Easy_Game.add(easy_render = new Easy_Render());
+        Easy_Game.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        Easy_Game.addKeyListener(this);
+        Easy_Game.setVisible(false);
+        
+        //The hard difficulty game frame.
+        Hard_Game = new JFrame("Hard Snake by Harry Klein");
+        Hard_Game.setSize(800, 700);
+        Hard_Game.setLocation(dim.width / 2 - Easy_Game.getWidth() / 2, dim.height / 2 - Easy_Game.getHeight() / 2);
+        Hard_Game.add(hard_render = new Hard_Render());
+        Hard_Game.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        Hard_Game.addKeyListener(this);
+        Hard_Game.setVisible(false);
+        
+        //Main menu jframe.
+        Main_menu = new JFrame("Snake - Main Menu");      
+        Main_menu.setContentPane(new JPanel(){ 	
+        	Image i = Resource_Loader.getImage("level_picture.jpg");
+        	public void paintComponent(Graphics g){
+        		super.paintComponent(g);
+        		g.drawImage( i, 0, 0, 800, 700, this);
+        }
+    });     
+        Main_menu.setSize(800,700);
+        Main_menu.setLocation(dim.width / 2 - Main_menu.getWidth() / 2, dim.height / 2 - Main_menu.getHeight() / 2);
+        Main_menu.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        Main_menu.setLayout(new FlowLayout());
+        JButton Start = new JButton("Start");
+        Main_menu.add(Start);
+        JButton settings = new JButton("Help");
+        Main_menu.add(settings);
+        JButton Close_game = new JButton("Close Game");
+        Main_menu.add(Close_game);
+        Main_menu.setVisible(true);
+        
+        //Settings menu jframe.
+        Settings_menu = new JFrame("Help");
+        GridBagConstraints c = new GridBagConstraints();
+        GridBagConstraints d = new GridBagConstraints();
+        GridBagConstraints e = new GridBagConstraints();
+        d.insets = new Insets(10,10,0,0);
+        e.insets = new Insets(0,0,10,10);
+        Settings_menu.setLayout(new GridBagLayout());
+        Settings_menu.setContentPane(new JPanel(){
+        	
+        	Image i = Resource_Loader.getImage("spanners_grey.gif");
+        	public void paintComponent(Graphics g){
+        		super.paintComponent(g);
+        		g.drawImage(i, 0, 0, 800, 700, this);
+        }
+    }); 
+        Settings_menu.setSize(800, 700);
+        Settings_menu.setLocation(dim.width / 2 - Settings_menu.getWidth() / 2, dim.height / 2 - Settings_menu.getHeight() / 2);
+        Settings_menu.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        JButton settings_back = new JButton("Return to Menu");
+        Settings_menu.add(settings_back, BorderLayout.NORTH);
+        JPanel Settings_menu_jpan1 = new JPanel(new GridBagLayout());
+        Settings_menu.add(Settings_menu_jpan1, BorderLayout.CENTER);
+        JLabel set_text1 = new JLabel("Field Snake: This is the basic game.");
+        JLabel set_text1_1 = new JLabel("The only pickup is the grape, which, after ten have been picked up, will spawn a bonus pickup. ");
+        JLabel set_text1_2 = new JLabel("The start is easy, as the snake's starting length is 3. ");
+        JLabel set_text2 = new JLabel("Python: This is a medium difficulty, and adds a number of other pickups for the user to play with.");
+        JLabel set_text2_1 = new JLabel("The poison pickup is added, which takes off 20 points, and after picking up 5 of the poisons,");
+        JLabel set_text2_2 = new JLabel(" a ”Death Blossom” pickup spawns, which instantly ends the game for the user. The snake starts at length 5.");
+        JLabel set_text3 = new JLabel(" King Cobra: This is the most challenging difficulty.");
+        JLabel set_text3_1 = new JLabel( " The pickups are similar to normal mode, but they act differently.");
+        JLabel set_text3_2 = new JLabel(" Each time a pickup is collided with, all the others on the board move to a new random location,");
+        JLabel set_text3_3 = new JLabel (" to increase the randomness and difficulty of the game. The snakes starting length is 7.");
+        JLabel instructions_1 = new JLabel("Controls: W/UP ARROW = UP");
+        JLabel instructions_2 = new JLabel("               A/LEFT ARROW = LEFT");
+        JLabel instructions_3 = new JLabel("               S/DOWN ARROW = DOWN");
+        JLabel instructions_4 = new JLabel("               D/RIGHT ARROW = RIGHT");
+        JLabel instructions_5 = new JLabel("               SPACE BAR = PAUSE/RESTART");
+        d.gridx = 0; d.gridy = 1; Settings_menu_jpan1.add(set_text1,d);
+        c.gridx = 0; c.gridy = 2; Settings_menu_jpan1.add(set_text1_1,c);
+        e.gridx = 0; e.gridy = 3; Settings_menu_jpan1.add(set_text1_2,e);
+        d.gridx = 0; d.gridy = 4; Settings_menu_jpan1.add(set_text2,d);
+        c.gridx = 0; c.gridy = 7; Settings_menu_jpan1.add(set_text2_1,c);
+        e.gridx = 0; e.gridy = 8; Settings_menu_jpan1.add(set_text2_2,e);
+        d.gridx = 0; d.gridy = 9; Settings_menu_jpan1.add(set_text3,d);
+        c.gridx = 0; c.gridy = 12; Settings_menu_jpan1.add(set_text3_1,c);
+        c.gridx = 0; c.gridy = 13; Settings_menu_jpan1.add(set_text3_2,c);
+        e.gridx = 0; e.gridy = 14; Settings_menu_jpan1.add(set_text3_3,e);
+        d.gridx = 0; d.gridy = 17; Settings_menu_jpan1.add(instructions_1,d);
+        c.gridx = 0; c.gridy = 18; Settings_menu_jpan1.add(instructions_2,c);
+        c.gridx = 0; c.gridy = 19; Settings_menu_jpan1.add(instructions_3,c);
+        c.gridx = 0; c.gridy = 20; Settings_menu_jpan1.add(instructions_4,c);
+        e.gridx = 0; e.gridy = 21; Settings_menu_jpan1.add(instructions_5,e);
+        Settings_menu.setVisible(false);
+         
+        //This jframe creates the level select screen.
+        level_Select = new JFrame("Level Select");
+        level_Select.setContentPane(new JPanel(){
+
+        	Image i = Resource_Loader.getImage("levelselect_picture.jpg");
+        	public void paintComponent(Graphics g){
+        		super.paintComponent(g);
+        		g.drawImage(i, 0, 0, 800,700, this);
+        	}
+        });
+        level_Select.setSize(800, 700);
+        level_Select.setLocation(dim.width / 2 - level_Select.getWidth() / 2, dim.height / 2 - level_Select.getHeight() / 2);
+        level_Select.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        level_Select.setLayout(new FlowLayout());
+        JButton easy = new JButton("Field Snake (Easy)");
+        level_Select.add(easy);
+        JButton medium = new JButton("Python (Medium)");
+        level_Select.add(medium);
+        JButton hard = new JButton("King Cobra (Hard)");
+        level_Select.add(hard);
+        JButton back = new JButton("Return");
+        level_Select.add(back);
+        level_Select.setVisible(false);
+        
+        //This action listener will do the things listed when the 'Start' button is pressed.
+        Start.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                Main_menu.setVisible(false); //Main menu set invisible.
+                Main_menu.dispose(); //Main menu frame disposed.
+                level_Select.setVisible(true); //Sets the level select window to visible.
+
+            }
+        });
+        
+        easy.addActionListener(new ActionListener() {
+        	
+        	@Override
+        	public void actionPerformed(ActionEvent e) {
+        		
+        		level_Select.setVisible(false);
+        		level_Select.dispose();
+        		Easy_Game.setVisible(true);
+        		startEasyGame();
+        		easy_music();
+        	}
+        });
+        
+        medium.addActionListener(new ActionListener() {
+        	
+        	@Override
+        	public void actionPerformed(ActionEvent e) {
+        		
+        		level_Select.setVisible(false);
+        		level_Select.dispose();
+        		Game_frame.setVisible(true);
+        		startNormalGame();
+        		norm_music();
+        	}
+        });
+
+        hard.addActionListener(new ActionListener() {
+		
+			@Override
+			public void actionPerformed(ActionEvent e) {
+		
+				level_Select.setVisible(false);
+        		level_Select.dispose();
+				Hard_Game.setVisible(true);
+				startHardGame();
+				hard_music();
+			}
+		});
+        
+        Close_game.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                Main_menu.setVisible(false);
+                Main_menu.dispose();
+                
+            }
+        });
+        
+        settings_back.addActionListener(new ActionListener() {
+
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                Settings_menu.setVisible(false);
+                Settings_menu.dispose();
+                Main_menu.setVisible(true);
+            }
+        });
+        
+        back.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                level_Select.setVisible(false);
+                level_Select.dispose();
+                Main_menu.setVisible(true);
+            }
+        });
+        
+        settings.addActionListener(new ActionListener() {
+        	
+        	@Override
+        	public void actionPerformed(ActionEvent e) {
+        		
+        		Main_menu.setVisible(false);
+        		Main_menu.dispose();
+        		Settings_menu.setVisible(true);
+        		hm_music();
+        		
+        	}
+        });      
+	}
+	
+	//This subroutine outlines the starting criteria for several of the key variables in the EASY DIFFICULTY game.
+    public void startEasyGame(){
+    	
+    	over = false;
+    	paused = true;
+    	time = 0;
+    	score = 0;
+    	tailLength = 2;
+    	ticks = 0;
+    	direction = DOWN;
+    	head  = new Point(0, -1);
+    	random = new Random();
+    	snakeParts.clear();
+    	easy_grape = new Point(random.nextInt(80), random.nextInt(40));
+    	bonus = new Point(1000, 1000);
+    	bonus_rand = 0;
+    	timer.start();
+    }
+	
+	//This subroutine outlines the starting criteria for several of the key variables in the NORMAL DIFFICULTY game.
+    public void startNormalGame(){
+
+        over = false; //The game is not over.
+        paused = true; //The game does not start playing without user input.
+        time = 0; //Variable 'time' = 0.
+        score = 0; //Variable 'score' = 0.
+        tailLength = 4; //Starting tail length = 4.
+        ticks = 0; // Variable 'ticks' = 0.
+        direction = DOWN; //Starting direction = down.
+        head = new Point(0, -1);
+        random = new Random();
+        snakeParts.clear(); //Removes any snake parts that may still be on the 'board'.
+        grape = new Point(random.nextInt(80), random.nextInt(40)); //Places the initial grape.
+        poison3 = new Point(random.nextInt(80), random.nextInt(40));//Places the initial poison.
+        bonus = new Point(1000, 1000); //Places the bonus pickup out of bounds, so it is ready to be placed when the condition is met.
+        golden_grape = new Point(1000, 1000); //Places the gold grape out of bounds, so it is ready to be placed when then condition is met.
+        bonus_rand = 0; //The variable for managing spawning of the bonus pickup.
+        goldg_rand = 0; //The variable for managing spawning of the gold grape.
+        timer.start(); //Starts the timer.
+        
+    }
+    
+    //This subroutine outlines the starting criteria for several of the key variables in the HARD DIFFICULTY game.
+    public void startHardGame(){
+    	
+    	over = false;
+    	paused = true;
+    	time = 0;
+    	score = 0;
+    	tailLength = 6;
+    	ticks = 0;
+    	direction = DOWN;
+    	head  = new Point(0, -1);
+    	random = new Random();
+    	snakeParts.clear();
+    	deathb_rand = 0;
+    	goldg_rand = 0;
+    	bonus_rand = 0;
+    	hard_grape = new Point(random.nextInt(80), random.nextInt(40));
+    	poison = new Point(random.nextInt(1000), random.nextInt(1000));
+    	poison2 = new Point(random.nextInt(80),random.nextInt(40));
+    	golden_grape = new Point(1000,1000); 
+    	death_blossom = new Point(1000,1000);
+    	bonus = new Point(1000,1000);
+    	timer.start();
+    }
+    
+    //This subroutine deals with all the mechanics of the game.
+    @Override
+    public void actionPerformed(ActionEvent arg0) {
+
+        render.repaint();
+        easy_render.repaint();
+        hard_render.repaint();
+        ticks++;
+
+        if (ticks % 2 == 0 && head != null && !over && !paused) {
+            time++;
+            snakeParts.add(new Point(head.x, head.y));
+
+            if (direction == UP)
+                if (head.y - 1 >= 0 && noTailAt(head.x, head.y -1))
+                    head = new Point(head.x, head.y - 1);
+                else
+                    over = true;
+           
+            if (direction == DOWN) 
+                if (head.y + 1 < 67 && noTailAt(head.x, head.y + 1))
+                    head = new Point(head.x, head.y + 1);
+                else
+                    over = true;            	
+        
+            if (direction == LEFT) 
+                if (head.x - 1 >= 0 && noTailAt(head.x - 1, head.y))
+                    head = new Point(head.x - 1, head.y);              
+                else
+                    over = true;
+                            
+            if (direction == RIGHT)
+                if (head.x + 1 < 80 && noTailAt(head.x + 1, head.y))
+                    head = new Point(head.x + 1, head.y);
+                else 
+                    over = true;            		
+              
+            if (snakeParts.size() > tailLength)
+                snakeParts.remove(0);
+            	
+            if (hard_grape != null) { //Check if the grape is present.
+                if (head.equals(hard_grape)) { //deals with the snake's collision with the food item (+1 length).
+                    score += 10;
+                    tailLength++;
+                    hard_grape.setLocation(random.nextInt(80), random.nextInt(40));
+                    bonus_rand++;
+                    grape_music();
+                    
+                    if (bonus_rand == 10){
+                    	
+                    	bonus.setLocation(random.nextInt(80), random.nextInt(40));
+                    	goldg_rand++;
+                    	
+                    	
+                    	if (goldg_rand == 3){
+                    		
+                    		golden_grape.setLocation(random.nextInt(80), random.nextInt(40));
+                    		
+                    	}
+                    }
+                }
+            }
+            
+            if (easy_grape != null) { //Check if the grape is present.
+                if (head.equals(easy_grape)) { //deals with the snake's collision with the food item (+1 length).
+                    score += 10;
+                    tailLength++;
+                    easy_grape.setLocation(random.nextInt(80), random.nextInt(40));
+                    bonus_rand++;
+                    grape_music();
+                    
+                    if (bonus_rand == 10){
+                    	
+                    	bonus.setLocation(random.nextInt(80), random.nextInt(40));
+                    	goldg_rand++;
+                    	
+                    	
+                    	if (goldg_rand == 3){
+                    		
+                    		golden_grape.setLocation(random.nextInt(80), random.nextInt(40));
+                    		
+                    	}
+                    }
+                }
+            }
+            
+            if (grape != null) { //Check if the grape is present.
+                if (head.equals(grape)) { //deals with the snake's collision with the food item (+1 length).
+                    score += 10;
+                    tailLength++;
+                    grape.setLocation(random.nextInt(80), random.nextInt(40));
+                    bonus_rand++;
+                    grape_music();
+                    poison3.setLocation(random.nextInt(80),  random.nextInt(40));
+                    
+                    if (bonus_rand == 10){
+                    	
+                    	bonus.setLocation(random.nextInt(80), random.nextInt(40));
+                    	goldg_rand++;
+                    	bonus_rand = 0;
+                    	
+                    	if (goldg_rand == 3){
+                    		
+                    		golden_grape.setLocation(random.nextInt(80), random.nextInt(40));
+                    		goldg_rand = 0;
+                    	}
+                    }
+                }
+            }
+            
+            if (bonus != null) {
+            	if (head.equals(bonus)){
+            		score += 100;
+            		bonus.setLocation(random.nextInt(1000), random.nextInt(1000));
+            		bonus_music();
+            		bonus_rand = 0;
+            		
+            	}
+            }
+            
+            if (death_blossom != null) {
+            	if (head.equals(death_blossom)){
+            		over = true;
+            		db_music();
+
+            	}
+            }
+            
+            if (poison3 != null) {
+            	if (head.equals(poison3)){
+            		score -= 20;
+            		poison3.setLocation(random.nextInt(80), random.nextInt(40));
+            		deathb_rand++;
+            		poison_music();
+            		
+            		if (deathb_rand == 5){
+            			
+            			death_blossom.setLocation(random.nextInt(80), random.nextInt(40));
+            			
+            		}	
+            	}
+            }
+            
+            if (poison2 != null) {
+            	if (head.equals(poison2)){
+            		score -= 20;
+            		poison2.setLocation(random.nextInt(80), random.nextInt(40));
+            		poison.setLocation(random.nextInt(80), random.nextInt(40));
+            		deathb_rand++;
+            		poison_music();
+            		
+            		if (deathb_rand == 5){
+            			
+            			death_blossom.setLocation(random.nextInt(80), random.nextInt(40));
+            			deathb_rand = 0;
+
+            		}	
+            	}
+            }
+            
+            if (poison != null) {
+            	if (head.equals(poison)){
+            		score -= 20;
+            		poison.setLocation(random.nextInt(80), random.nextInt(40));
+            		poison2.setLocation(random.nextInt(80), random.nextInt(40));
+            		deathb_rand++;
+            		poison_music();
+            		
+            		if (deathb_rand == 5){
+            			
+            			death_blossom.setLocation(random.nextInt(80), random.nextInt(40));
+            			deathb_rand = 0;
+            		}	
+            	}
+            }
+            
+            if (golden_grape != null) {
+            	if (head.equals(golden_grape)){
+            		score += 50;
+            		tailLength += 5;
+            		golden_grape.setLocation(random.nextInt(1000), random.nextInt(1000));
+            		goldgrape_music();
+            		goldg_rand = 0;
+            		
+            	}
+            }
+        }
+    }
+   
+    //Deals with collisions with the tail.
+    private boolean noTailAt(int x, int y) {
+        for (Point point : snakeParts) {
+            if (point.equals(new Point(x, y))) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    //The main subroutine where other subroutines are activated.
+    public static void main(String[] args) throws IOException{
+
+        game = new Snake();
+        mm_music();
+    }
+    
+    //Deals with key presses in the game.
+    @Override
+    public void keyPressed(KeyEvent e) {
+
+        int h = e.getKeyCode();
+        
+        if (h == KeyEvent.VK_ESCAPE){
+            Game_frame.dispose();
+        }
+
+        if ((h == KeyEvent.VK_A || h == KeyEvent.VK_LEFT) && direction != RIGHT) {
+            direction = LEFT;
+        }
+
+        if ((h == KeyEvent.VK_D || h == KeyEvent.VK_RIGHT) && direction != LEFT) {
+            direction = RIGHT;
+        }
+
+        if ((h == KeyEvent.VK_S || h == KeyEvent.VK_DOWN) && direction != UP) {
+            direction = DOWN;
+        }
+
+        if ((h == KeyEvent.VK_W || h == KeyEvent.VK_UP) && direction != DOWN) {
+            direction = UP;
+        }
+
+        if (h == KeyEvent.VK_SPACE){               
+            if (over) {
+                	
+                Game_frame.setVisible(false);
+                Game_frame.dispose();
+                Easy_Game.setVisible(false);
+                Easy_Game.dispose();
+                Hard_Game.setVisible(false);
+                Hard_Game.dispose();
+                level_Select.setVisible(true);
+                	
+            } else {              	
+                paused = !paused;
+                	
+            }
+        }
+    }
+    
+    //Not used, but needs to be present in the code.
+    @Override
+    public void keyReleased(KeyEvent e) {
+
+    }
+    
+    //Not used, but needs to be present in the code.
+    @Override
+    public void keyTyped(KeyEvent e) {
+
+    }
+}
