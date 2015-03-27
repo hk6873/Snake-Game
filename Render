@@ -1,0 +1,73 @@
+package Snake;
+
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Point;
+
+import javax.swing.JPanel;
+
+/**
+ *
+ * The class that renders & processes the in-game objects for the normal difficulty game.
+ * @author harryklein
+ *
+ */
+
+@SuppressWarnings("serial")
+public class Render extends JPanel  {
+
+    public static Color purple = new Color(0x6E73EF);
+    public static Color orange = new Color(0xBB5400);
+    public static Color green = new Color(0x1DBC1A);
+    public static Color peach = new Color(0xFFD7CD);
+    public static Color dark_orange = new Color(0x8D4700);
+      
+    @Override
+    protected void paintComponent(Graphics g) {
+	
+        super.paintComponent(g);
+        Snake snake = Snake.game;
+        g.setColor(purple);
+        g.fillRect(0,0,800,700);
+        g.setColor(orange);
+              
+        for (Point point : snake.snakeParts) {
+
+            g.fillRect(point.x * Snake.SCALE, point.y * Snake.SCALE, Snake.SCALE, Snake.SCALE);
+        }
+        
+        g.setColor(dark_orange);
+        g.fillRect(snake.head.x * Snake.SCALE, snake.head.y * Snake.SCALE, Snake.SCALE, Snake.SCALE);
+        g.setColor(green);
+        g.fillRect(snake.grape.x * Snake.SCALE, snake.grape.y * Snake.SCALE, Snake.SCALE, Snake.SCALE);
+        g.setColor(Color.RED);
+        g.fillRect(snake.poison3.x * Snake.SCALE, snake.poison3.y * Snake.SCALE, Snake.SCALE, Snake.SCALE);
+        g.setColor(Color.CYAN);
+        g.fillRect(snake.bonus.x * Snake.SCALE, snake.bonus.y * Snake.SCALE, Snake.SCALE, Snake.SCALE);
+        g.setColor(Color.YELLOW);
+        g.fillRect(snake.golden_grape.x * Snake.SCALE, snake.golden_grape.y * Snake.SCALE, Snake.SCALE, Snake.SCALE);
+
+        String string = "Total Score: " + snake.score + "      Snake Length: " + snake.tailLength +
+                "      This Life: " + snake.time / 20 + " Seconds";
+
+        g.setColor(peach);
+        g.drawString(string, (int) (getWidth() / 2 - string.length() * 2.5f), 15);
+
+        string = "Game Over! :/";
+        if (snake.over){
+
+            g.drawString(string, (int) (getWidth() / 2 - string.length() * 2.5f), (int) snake.dim.getHeight() / 4);
+        }
+        
+        string = "Press 'SPACE' to RESET the game or 'ESCAPE' to exit!";
+        if (snake.over){
+            g.drawString(string, (int) (getWidth() / 2 - string.length() * 2.5f), (int) snake.dim.getHeight() / 3);
+        }
+        
+        string = "Press SPACE to start/resume Snake!";
+        if (snake.paused && !snake.over){
+            g.drawString(string, (int) (getWidth() / 2 - string.length() * 2.5f), (int) snake.dim.getHeight() / 4);
+        }
+    
+    }
+}
